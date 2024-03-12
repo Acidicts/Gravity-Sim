@@ -124,7 +124,7 @@ def create_ship(location, mouse):
 
 
 def check(obj, objects):
-    global Planet
+    global planet
     obj.draw()
     obj.move(planet)
     off_screen = obj.x < 0 or obj.x > WIDTH or obj.y < 0 or obj.y > WIDTH
@@ -134,12 +134,12 @@ def check(obj, objects):
 
 
 def main():
-    global Planet
+    global planet
     running = True
     clock = pygame.time.Clock()
 
     trails_button = Button(0, 600, trail_button_img)
-    Planetlanet = Planet(WIDTH // 2, HEIGHT // 2, PLANET_MASS)
+    planet = Planet(WIDTH // 2, HEIGHT // 2, PLANET_MASS)
     temp_obj_pos = None
 
     trails.set_colorkey((0, 0, 0))
@@ -205,9 +205,9 @@ def main():
             pygame.draw.circle(win, RED, temp_obj_pos, OBJ_SIZE)
 
         for obj in objects[:]:
-            threading.Thread(target=lambda: check(obj, objects), args=(obj, objects)).start()
+            threading.Thread(target=lambda : check(obj, objects),daemon=True).start()
 
-        Planet.draw()
+        planet.draw()
         trails_button.update(win)
         pygame.display.update()
 
