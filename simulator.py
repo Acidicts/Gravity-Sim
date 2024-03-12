@@ -1,3 +1,4 @@
+import threading
 import pygame
 import math
 import time
@@ -122,12 +123,23 @@ def create_ship(location, mouse):
     return obj
 
 
+def check(obj, objects):
+    global Planet
+    obj.draw()
+    obj.move(planet)
+    off_screen = obj.x < 0 or obj.x > WIDTH or obj.y < 0 or obj.y > WIDTH
+    collided = math.sqrt((obj.x - planet.x) ** 2 + (obj.y - planet.y) ** 2) <= PLANET_SIZE
+    if off_screen or collided:
+        objects.remove(obj)
+
+
 def main():
+    global Planet
     running = True
     clock = pygame.time.Clock()
 
     trails_button = Button(0, 600, trail_button_img)
-    planet = Planet(WIDTH // 2, HEIGHT // 2, PLANET_MASS)
+    Planetlanet = Planet(WIDTH // 2, HEIGHT // 2, PLANET_MASS)
     temp_obj_pos = None
 
     trails.set_colorkey((0, 0, 0))
@@ -193,14 +205,9 @@ def main():
             pygame.draw.circle(win, RED, temp_obj_pos, OBJ_SIZE)
 
         for obj in objects[:]:
-            obj.draw()
-            obj.move(planet)
-            off_screen = obj.x < 0 or obj.x > WIDTH or obj.y < 0 or obj.y > WIDTH
-            collided = math.sqrt((obj.x - planet.x) ** 2 + (obj.y - planet.y) ** 2) <= PLANET_SIZE
-            if off_screen or collided:
-                objects.remove(obj)
+            threading.Thread(target=lambda: check(obj, objects), args=(obj, objects)).start()
 
-        planet.draw()
+        Planet.draw()
         trails_button.update(win)
         pygame.display.update()
 
