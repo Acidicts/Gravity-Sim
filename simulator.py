@@ -1,3 +1,4 @@
+import threading
 import pygame
 import math
 
@@ -32,7 +33,6 @@ PLANET_SIZE = 50
 OBJ_SIZE = 5
 VEL_SCALE = 100
 objects = []
-font = pygame.font.SysFont("comicsans", 30)
 
 BG = pygame.transform.scale(pygame.image.load("background.jpg"), (WIDTH, HEIGHT))
 PLANET = pygame.transform.scale(pygame.image.load("jupiter.png"), (PLANET_SIZE * 2, PLANET_SIZE * 2))
@@ -63,7 +63,9 @@ class Button:
         if self.rect.collidepoint(self.mouse_pos):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP:
+                    print("Clicked")
                     trail = not trail
+                    print(trail)
 
             return True
         else:
@@ -121,16 +123,11 @@ def create_ship(location, mouse):
 
 
 def main():
-    global trail_col
     running = True
     clock = pygame.time.Clock()
 
-    trails_button = Button(0, HEIGHT, trail_button_img)
-    font.render("Trails", True, WHITE)
-    planets = []
-    planets.append(Planet(WIDTH // 2, HEIGHT // 2, PLANET_MASS))
-    # planets.append(Planet(WIDTH // 4, HEIGHT // 2, PLANET_MASS))
-    # planets.append(Planet(WIDTH // 4 * 3, HEIGHT // 2, PLANET_MASS))
+    trails_button = Button(0, 600, trail_button_img)
+    planet = Planet(WIDTH // 2, HEIGHT // 2, PLANET_MASS)
     temp_obj_pos = None
 
     trails.set_colorkey((0, 0, 0))
@@ -196,17 +193,14 @@ def main():
             pygame.draw.circle(win, RED, temp_obj_pos, OBJ_SIZE)
 
         for obj in objects[:]:
-            for planet in range(len(planets)):
-                p = planets[planet]
-                obj.draw()
-                obj.move(p)
-                off_screen = obj.x < 0 or obj.x > WIDTH or obj.y < 0 or obj.y > WIDTH
-                collided = math.sqrt((obj.x - p.x) ** 2 + (obj.y - p.y) ** 2) <= PLANET_SIZE
+            obj.draw()
+            obj.move(planet)
+            off_screen = obj.x < 0 or obj.x > WIDTH or obj.y < 0 or obj.y > WIDTH
+            collided = math.sqrt((obj.x - planet.x) ** 2 + (obj.y - planet.y) ** 2) <= PLANET_SIZE
             if off_screen or collided:
                 objects.remove(obj)
 
-        for planet in range(len(planets)):
-            planets[planet].draw()
+        planet.draw()
         trails_button.update(win)
         pygame.display.update()
 
